@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:auto_route/annotations.dart';
 
 import 'package:siyuan_ai_companion_ui/widget/setting.dart';
 
-@RoutePage()
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
 
@@ -19,10 +17,10 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
+        // leading: IconButton(
+        //   onPressed: () => Navigator.of(context).pop(),
+        //   icon: const Icon(Icons.arrow_back),
+        // ),
       ),
       body: SingleChildScrollView(
         child: Padding(

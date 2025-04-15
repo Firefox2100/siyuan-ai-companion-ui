@@ -1,16 +1,14 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ai_toolkit/flutter_ai_toolkit.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:provider/provider.dart';
 
 import 'package:siyuan_ai_companion_ui/model/form_factor.dart';
+import 'package:siyuan_ai_companion_ui/page/setting.dart';
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/provider/openai.dart';
-import 'package:siyuan_ai_companion_ui/route/router.gr.dart';
+import 'package:siyuan_ai_companion_ui/widget/chat_session_list.dart';
 import 'package:siyuan_ai_companion_ui/widget/setting.dart';
 
-@RoutePage()
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
 
@@ -20,18 +18,8 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage>
     with SingleTickerProviderStateMixin {
-  late final _animationController = AnimationController(
-    duration: const Duration(seconds: 1),
-    vsync: this,
-    lowerBound: 0.25,
-    upperBound: 1.0,
-  );
   late final OpenAiProvider _provider;
-
-  void _resetAnimation() {
-    _animationController.value = 1.0;
-    _animationController.reverse();
-  }
+  late Future<List<ChatSession>> _sessionsFuture;
 
   Future<void> _onShowSettings() async {
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -83,8 +71,182 @@ class _ChatPageState extends State<ChatPage>
       );
     } else {
       // Navigate to setting page on mobile
-      await context.router.navigate(SettingRoute());
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SettingPage()),
+      );
     }
+  }
+
+  void _refreshSessionList() {
+    setState(() {
+      _sessionsFuture = _provider.getAllSessions();
+    });
+  }
+
+  Future<void> _onSelectSession(int sessionId) async {
+    await _provider.loadSession(sessionId);
+    _refreshSessionList();
+  }
+
+  Future<void> _onNewSession(String? name) async {
+    await _provider.startNewSession(name);
+    _refreshSessionList();
+  }
+
+  Future<void> _onRenameSession(int sessionId) async {
+    final controller = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Rename Session'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'New Name'),
+            onSubmitted: (newName) async {
+              await _provider.renameSession(sessionId, newName);
+
+              if (context.mounted) {
+                Navigator.pop(context);
+                _refreshSessionList();
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await _provider.renameSession(sessionId, controller.text);
+
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  _refreshSessionList();
+                }
+              },
+              child: const Text('Rename'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _onDeleteSession(int sessionId) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Session'),
+          content: const Text('Are you sure you want to delete this session?'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await _provider.deleteSession(sessionId);
+
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  _refreshSessionList();
+                }
+              },
+              child: const Text('Delete'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildChatLayout(List<ChatSession> sessions) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
+    if (screenWidth > FormFactor.mobile) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Chat'),
+          actions: [
+            IconButton(
+              onPressed: () => _onNewSession(null),
+              icon: const Icon(Icons.add),
+            ),
+            IconButton(
+              onPressed: () => _onShowSettings(),
+              icon: const Icon(Icons.settings),
+            ),
+          ],
+        ),
+        body: Row(
+          children: [
+            SizedBox(
+              width: 300,
+              child: ChatSessionList(
+                sessions: sessions,
+                onSessionSelected:
+                    (int sessionId) async => await _onSelectSession(sessionId),
+                onSessionRenamed:
+                    (int sessionId) async => await _onRenameSession(sessionId),
+                onSessionDeleted:
+                    (int sessionId) async => await _onDeleteSession(sessionId),
+              ),
+            ),
+            const VerticalDivider(width: 1),
+            Expanded(
+              child: LlmChatView(
+                provider: _provider,
+                welcomeMessage: 'Welcome to SiYuan AI Companion!',
+                suggestions: const ['What is in my calendar today?'],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Chat'),
+        actions: [
+          IconButton(
+            onPressed: () => _onNewSession(null),
+            icon: const Icon(Icons.add),
+          ),
+          IconButton(
+            onPressed: () => _onShowSettings(),
+            icon: const Icon(Icons.settings),
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: ChatSessionList(
+          sessions: sessions,
+          onSessionSelected:
+              (int sessionId) async => await _onSelectSession(sessionId),
+          onSessionRenamed:
+              (int sessionId) async => await _onRenameSession(sessionId),
+          onSessionDeleted:
+              (int sessionId) async => await _onDeleteSession(sessionId),
+        ),
+      ),
+      body: LlmChatView(
+        provider: _provider,
+        welcomeMessage: 'Welcome to SiYuan AI Companion!',
+        suggestions: const ['What is in my calendar today?'],
+      ),
+    );
+  }
+
+  Future<List<ChatSession>> _initializeAll() async {
+    if (_provider.activeSessionId == null) {
+      await _provider.startNewSession(null);
+    }
+    return _provider.getAllSessions();
   }
 
   @override
@@ -94,37 +256,31 @@ class _ChatPageState extends State<ChatPage>
     final configProvider = context.read<ConfigProvider>();
     _provider = OpenAiProvider(configProvider: configProvider);
 
-    _resetAnimation();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
+    _sessionsFuture = _initializeAll();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat'),
-        actions: [
-          IconButton(
-            onPressed: () => _onShowSettings(),
-            icon: const Icon(Icons.settings),
-          ),
-          // IconButton(
-          //   onPressed: _clearHistory,
-          //   tooltip: 'Clear History',
-          //   icon: const Icon(Icons.history),
-          // ),
-        ],
-      ),
-      body: LlmChatView(
-        provider: _provider,
-        welcomeMessage: 'Welcome to SiYuan AI Companion!',
-        suggestions: ['What is in my calendar today?'],
-      ),
+    return FutureBuilder<List<ChatSession>>(
+      future: _sessionsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Text('Error loading sessions: ${snapshot.error}'),
+            ),
+          );
+        }
+
+        final sessions = snapshot.data ?? [];
+        return _buildChatLayout(sessions);
+      },
     );
   }
 }

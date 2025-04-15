@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
-import 'package:siyuan_ai_companion_ui/route/router.dart';
+import 'package:siyuan_ai_companion_ui/page/chat.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +25,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final AppRouter _appRouter = AppRouter();
-
   @override
   void initState() {
     super.initState();
@@ -42,9 +40,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return MaterialApp(
       title: 'SiYuan AI Companion',
-      routerConfig: _appRouter.config(),
+      home: ChatPage(),
     );
   }
 }
