@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:web/web.dart' as web;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dart_openai/dart_openai.dart';
 
@@ -18,6 +19,19 @@ class ConfigProvider extends ChangeNotifier {
     _openAiModel = _prefs.getString('open_ai_model');
     _openAiApiUrl = _prefs.getString('open_ai_api_url');
 
+    if (_openAiApiUrl != null) {
+      OpenAI.baseUrl = _openAiApiUrl!;
+    }
+    else {
+      final location = web.window.location;
+      OpenAI.baseUrl = Uri(
+        scheme: location.protocol.replaceAll(':', ''),
+        host: location.hostname,
+        port: location.port.isNotEmpty ? int.tryParse(location.port) : null,
+        path: 'openai',
+      ).toString();
+    }
+
     if (_openAiKey != null && _openAiKey!.isNotEmpty) {
       OpenAI.apiKey = _openAiKey!;
     }
@@ -27,10 +41,6 @@ class ConfigProvider extends ChangeNotifier {
 
     if (_openAiOrgId != null) {
       OpenAI.organization = _openAiOrgId!;
-    }
-
-    if (_openAiApiUrl != null) {
-      OpenAI.baseUrl = _openAiApiUrl!;
     }
   }
 

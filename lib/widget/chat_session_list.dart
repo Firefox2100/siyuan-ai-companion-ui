@@ -50,8 +50,11 @@ class _ChatSessionTile extends StatefulWidget {
   State<_ChatSessionTile> createState() => _ChatSessionTileState();
 }
 
+// Dart
 class _ChatSessionTileState extends State<_ChatSessionTile> {
   bool _hovering = false;
+  bool _isMenuOpen = false;
+  final GlobalKey _popupMenuKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +65,19 @@ class _ChatSessionTileState extends State<_ChatSessionTile> {
         title: Text(widget.session.name),
         subtitle: Text(widget.session.createdAt.toLocal().toString()),
         onTap: () => widget.onSelected(widget.session.id),
-        trailing: _hovering
+        trailing: (_hovering || _isMenuOpen)
             ? PopupMenuButton<String>(
+          key: _popupMenuKey,
           itemBuilder: (context) {
             return [
-              PopupMenuItem(value: 'rename', child: const Text('Rename')),
-              PopupMenuItem(value: 'delete', child: const Text('Delete')),
+              PopupMenuItem(
+                value: 'rename',
+                child: const Text('Rename'),
+              ),
+              PopupMenuItem(
+                value: 'delete',
+                child: const Text('Delete'),
+              ),
             ];
           },
           onSelected: (value) {
@@ -79,6 +89,20 @@ class _ChatSessionTileState extends State<_ChatSessionTile> {
               } else if (value == 'delete') {
                 widget.onDeleted(widget.session.id);
               }
+            });
+
+            setState(() {
+              _isMenuOpen = false;
+            });
+          },
+          onOpened: () {
+            setState(() {
+              _isMenuOpen = true;
+            });
+          },
+          onCanceled: () {
+            setState(() {
+              _isMenuOpen = false;
             });
           },
         )

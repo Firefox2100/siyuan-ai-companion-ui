@@ -17,10 +17,6 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
-        // leading: IconButton(
-        //   onPressed: () => Navigator.of(context).pop(),
-        //   icon: const Icon(Icons.arrow_back),
-        // ),
       ),
       body: SingleChildScrollView(
         child: Padding(
