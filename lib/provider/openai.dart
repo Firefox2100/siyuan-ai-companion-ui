@@ -111,6 +111,47 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<String> generateSessionName({int? sessionId}) async {
+    sessionId ??= _activeSessionId;
+
+    if (sessionId == null) {
+      throw Exception('No active session. Call startNewSession() first.');
+    }
+
+    final sessionMap = await DatabaseService.getSession(sessionId);
+
+    if (sessionMap['name'] != '@New Session') {
+      throw Exception('Session is already named');
+    }
+
+    final messages = await DatabaseService.getMessagesForSession(sessionId);
+
+    final prompt = StringBuffer();
+    prompt.write('Generate a name for a chat session with the following messages:\n\n');
+    for (final message in messages) {
+      final isUser = message['is_user'] == 1;
+      final text = message['text'] as String;
+      prompt.write('${isUser ? 'User' : 'AI'}: $text\n');
+    }
+    prompt.write('\nName:');
+
+    final newNameResult = await OpenAI.instance.completion.create(
+      model: _configProvider.openAiModel ?? 'gpt-3.5-turbo',
+      prompt: prompt.toString(),
+      maxTokens: 10,
+      temperature: 0.7,
+    );
+    final newName = newNameResult.choices.first.text.trim();
+
+    if (newName.isEmpty) {
+      throw Exception('Failed to generate a name for the session.');
+    }
+
+    await renameSession(sessionId, newName);
+
+    return newName;
+  }
+
   @override
   Stream<String> generateStream(
     String prompt, {

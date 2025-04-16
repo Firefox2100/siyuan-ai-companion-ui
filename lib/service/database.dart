@@ -52,6 +52,15 @@ class DatabaseService {
     await _messagesStore.delete(dbClient, finder: finder);
   }
 
+  static Future<Map<String, dynamic>> getSession(int sessionId) async {
+    final dbClient = await db;
+    final record = await _sessionsStore.record(sessionId).get(dbClient);
+    if (record == null) {
+      throw Exception('Session not found');
+    }
+    return {'id': sessionId, ...record};
+  }
+
   static Future<List<Map<String, dynamic>>> getSessions() async {
     final dbClient = await db;
     final records = await _sessionsStore.find(
