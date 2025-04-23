@@ -18,6 +18,8 @@ class _SettingInputState extends State<SettingInput> {
   final TextEditingController _openAiModelController = TextEditingController();
   final TextEditingController _openAiApiUrlController = TextEditingController();
 
+  late bool enableRag;
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +42,8 @@ class _SettingInputState extends State<SettingInput> {
         configProvider.openAiApiUrl!.isNotEmpty) {
       _openAiApiUrlController.text = configProvider.openAiApiUrl!;
     }
+
+    enableRag = configProvider.enableRag;
   }
 
   @override
@@ -143,6 +147,19 @@ class _SettingInputState extends State<SettingInput> {
                   return;
                 }
                 configProvider.setOpenAiApiUrl(value);
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10, bottom: 10, right: 50),
+            child: SwitchListTile(
+              title: const Text('Enable RAG'),
+              value: enableRag,
+              onChanged: (value) {
+                setState(() {
+                  enableRag = value;
+                });
+                configProvider.setEnableRag(value);
               },
             ),
           ),

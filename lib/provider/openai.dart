@@ -27,11 +27,14 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
   OpenAiProvider({
     Iterable<ChatMessage>? history,
     required ConfigProvider configProvider,
+    required Function() refreshSessionList,
   }) : _history = List<ChatMessage>.from(history ?? []),
-       _configProvider = configProvider;
+       _configProvider = configProvider,
+       _refreshSessionList = refreshSessionList ;
 
   final List<ChatMessage> _history;
   final ConfigProvider _configProvider;
+  final Function() _refreshSessionList;
   int? _activeSessionId;
 
   @override
@@ -68,9 +71,9 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
 
   Future<void> startNewSession(String? name) async {
     final cleanName = (name ?? '').trim();
-    // @New Session is reserved
-    if (cleanName == '@New Session') {
-      throw SessionRenameException('Session name cannot be "@New Session".');
+    // @New Conversation is reserved
+    if (cleanName == '@New Conversation') {
+      throw SessionRenameException('Session name cannot be "@New Conversation".');
     }
 
     final sessionId = await DatabaseService.createSession(
@@ -93,8 +96,8 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
   }
 
   Future<void> renameSession(int sessionId, String newName) async {
-    if (newName.trim() == '@New Session') {
-      throw SessionRenameException('Session name cannot be "@New Session".');
+    if (newName.trim() == '@New Conversation') {
+      throw SessionRenameException('Session name cannot be "@New Conversation".');
     }
 
     await DatabaseService.renameSession(sessionId, newName.trim());
@@ -120,7 +123,7 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
 
     final sessionMap = await DatabaseService.getSession(sessionId);
 
-    if (sessionMap['name'] != '@New Session') {
+    if (sessionMap['name'] != '@New Conversation') {
       throw Exception('Session is already named');
     }
 
@@ -233,6 +236,23 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
       llmMessage.text ?? '',
       false,
     );
+
+    Future.microtask(() async {
+      if (_history.length == 2 &&
+          _history[0].origin.isUser &&
+          _history[1].origin.isLlm) {
+        final session = await DatabaseService.getSession(_activeSessionId!);
+
+        if (session['name'] == '@New Conversation') {
+          final newName = await generateSessionName(sessionId: _activeSessionId);
+
+          DatabaseService.renameSession(_activeSessionId!, newName);
+
+          _refreshSessionList();
+        }
+      }
+    });
+
     notifyListeners();
   }
 }

@@ -12,6 +12,8 @@ class ConfigProvider extends ChangeNotifier {
   String? _openAiModel;
   String? _openAiApiUrl;
 
+  bool _enableRag = true;
+
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
 
@@ -19,6 +21,8 @@ class ConfigProvider extends ChangeNotifier {
     _openAiOrgId = _prefs.getString('open_ai_org_id');
     _openAiModel = _prefs.getString('open_ai_model');
     _openAiApiUrl = _prefs.getString('open_ai_api_url');
+
+    _enableRag = _prefs.getBool('enable_rag') ?? true;
 
     if (_openAiApiUrl != null) {
       OpenAI.baseUrl = _openAiApiUrl!;
@@ -48,6 +52,8 @@ class ConfigProvider extends ChangeNotifier {
   String? get openAiOrgId => _openAiOrgId;
   String? get openAiModel => _openAiModel;
   String? get openAiApiUrl => _openAiApiUrl;
+
+  bool get enableRag => _enableRag;
 
   Future<void> setOpenAiKey(String key) async {
     _openAiKey = key;
@@ -79,6 +85,12 @@ class ConfigProvider extends ChangeNotifier {
 
     OpenAI.baseUrl = apiUrl;
 
+    notifyListeners();
+  }
+
+  Future<void> setEnableRag(bool enable) async {
+    _enableRag = enable;
+    await _prefs.setBool('enable_rag', enable);
     notifyListeners();
   }
 }
