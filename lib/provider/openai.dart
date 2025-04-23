@@ -161,7 +161,16 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
     String prompt, {
     Iterable<Attachment> attachments = const [],
   }) async* {
-    final messages = <OpenAIChatCompletionChoiceMessageModel>[];
+    final messages = <OpenAIChatCompletionChoiceMessageModel>[
+      OpenAIChatCompletionChoiceMessageModel(
+        role: OpenAIChatMessageRole.system,
+        content: [
+          OpenAIChatCompletionChoiceMessageContentItemModel.text(
+            _configProvider.openAiSystemPrompt,
+          ),
+        ],
+      )
+    ];
 
     for (final message in _history) {
       if (message.text == null) {

@@ -17,6 +17,8 @@ class _SettingInputState extends State<SettingInput> {
   final TextEditingController _openAiOrgIdController = TextEditingController();
   final TextEditingController _openAiModelController = TextEditingController();
   final TextEditingController _openAiApiUrlController = TextEditingController();
+  final TextEditingController _openAiSystemPromptController =
+      TextEditingController();
 
   late bool enableRag;
 
@@ -41,6 +43,9 @@ class _SettingInputState extends State<SettingInput> {
     if (configProvider.openAiApiUrl != null &&
         configProvider.openAiApiUrl!.isNotEmpty) {
       _openAiApiUrlController.text = configProvider.openAiApiUrl!;
+    }
+    if (configProvider.openAiSystemPrompt.isNotEmpty) {
+      _openAiSystemPromptController.text = configProvider.openAiSystemPrompt;
     }
 
     enableRag = configProvider.enableRag;
@@ -139,7 +144,7 @@ class _SettingInputState extends State<SettingInput> {
               decoration: const InputDecoration(
                 icon: Icon(Icons.api),
                 labelText: 'OpenAI API URL',
-                hintText: 'Leave empty to use the official OpenAI API',
+                hintText: 'Leave empty to use the backend API',
                 border: OutlineInputBorder(),
               ),
               onSaved: (value) {
@@ -147,6 +152,26 @@ class _SettingInputState extends State<SettingInput> {
                   return;
                 }
                 configProvider.setOpenAiApiUrl(value);
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10, bottom: 10, right: 50),
+            child: TextFormField(
+              controller: _openAiSystemPromptController,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.api),
+                labelText: 'OpenAI System Prompt',
+                hintText: 'The system prompt to use for generation',
+                border: OutlineInputBorder(),
+              ),
+              minLines: 5,
+              maxLines: 5,
+              onSaved: (value) {
+                if (value == null || value.isEmpty) {
+                  return;
+                }
+                configProvider.setOpenAiSystemPrompt(value);
               },
             ),
           ),
