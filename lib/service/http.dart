@@ -53,13 +53,14 @@ class HttpService {
     String model,
   ) async {
     final data = await HttpService.rawPost(
-      '$ORIGIN/openai/direct/v1/retrieve',
+      'http://localhost:5000/openai/direct/v1/retrieve',
+      //'$ORIGIN/openai/direct/v1/retrieve',
       {
         'prompt': prompt,
         'model': model,
       },
     );
 
-    return data['context'] as List<String>;
+    return List<String>.from(data['context'].map((x) => x.toString()));
   }
 }

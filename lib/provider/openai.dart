@@ -9,6 +9,7 @@ import 'package:dart_openai/dart_openai.dart';
 
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/service/database.dart';
+import 'package:siyuan_ai_companion_ui/service/http.dart';
 
 class SessionRenameException implements Exception {
   final String message;
@@ -222,6 +223,22 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
     final userMessage = ChatMessage.user(prompt, attachments);
     final llmMessage = ChatMessage.llm();
     _history.addAll([userMessage, llmMessage]);
+
+    try {
+      if (_configProvider.enableRag) {
+        final contexts = await HttpService.getContextForPrompt(
+          prompt,
+          _configProvider.openAiModel ?? 'gpt-3.5-turbo',
+        );
+
+        if (contexts.isNotEmpty) {
+          prompt = 'Context:\n${contexts.join('\n')}\nAnswer the question: $prompt';
+        }
+      }
+    } catch (e) {
+      throw LlmFailureException('Failed to retrieve context: ${e.toString()}');
+    }
+
     final response = generateStream(prompt, attachments: attachments);
 
     await DatabaseService.saveMessage(_activeSessionId!, prompt, true);
