@@ -257,6 +257,23 @@ class _ChatPageState extends State<ChatPage>
         provider: _provider,
         welcomeMessage: 'Welcome to SiYuan AI Companion!',
         suggestions: const ['What is in my calendar today?'],
+        messageSender: (
+            String prompt, {
+              Iterable<Attachment> attachments = const [],
+            }) async* {
+          await for (final message in _provider.generateStream(
+            prompt,
+            attachments: attachments,
+          )) {
+            if (context.mounted) {
+              yield message;
+            } else {
+              break;
+            }
+          }
+
+          Future.microtask(() => _generateNewChatName());
+        },
       ),
     );
   }

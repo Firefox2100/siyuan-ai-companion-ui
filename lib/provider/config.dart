@@ -27,6 +27,7 @@ class ConfigProvider extends ChangeNotifier {
       OpenAI.baseUrl = Uri(
         scheme: PROTOCOL,
         host: HOST,
+        port: PORT,
         path: 'openai/direct',
       ).toString();
     }
