@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:web/web.dart' as web;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dart_openai/dart_openai.dart';
+
+import 'package:siyuan_ai_companion_ui/model/consts.dart';
 
 class ConfigProvider extends ChangeNotifier {
   late final SharedPreferences _prefs;
@@ -23,12 +24,10 @@ class ConfigProvider extends ChangeNotifier {
       OpenAI.baseUrl = _openAiApiUrl!;
     }
     else {
-      final location = web.window.location;
       OpenAI.baseUrl = Uri(
-        scheme: location.protocol.replaceAll(':', ''),
-        host: location.hostname,
-        port: location.port.isNotEmpty ? int.tryParse(location.port) : null,
-        path: 'openai',
+        scheme: PROTOCOL,
+        host: HOST,
+        path: 'openai/direct',
       ).toString();
     }
 
