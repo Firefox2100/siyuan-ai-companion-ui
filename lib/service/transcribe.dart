@@ -13,9 +13,9 @@ class TranscribeException implements Exception {
 
 class AudioAsset {
   final String path;
-  final String transcriptionBlockId;
+  final String? transcriptionBlockId;
 
-  AudioAsset({required this.path, required this.transcriptionBlockId});
+  AudioAsset({required this.path, this.transcriptionBlockId});
 }
 
 class TranscribeService {
@@ -31,5 +31,12 @@ class TranscribeService {
     }
 
     return assets;
+  }
+
+  static Future<void> transcribeAudio(String path) async {
+    await HttpService.rawPost(
+      '$ORIGIN/assets/audio/transcribe',
+      {'assetPath': path},
+    );
   }
 }
