@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ai_toolkit/flutter_ai_toolkit.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import 'package:siyuan_ai_companion_ui/model/form_factor.dart';
 import 'package:siyuan_ai_companion_ui/page/setting.dart';
+import 'package:siyuan_ai_companion_ui/page/transcribe.dart';
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/provider/openai.dart';
 import 'package:siyuan_ai_companion_ui/widget/chat_session_list.dart';
@@ -76,6 +78,13 @@ class _ChatPageState extends State<ChatPage>
         MaterialPageRoute(builder: (context) => SettingPage()),
       );
     }
+  }
+
+  Future<void> _onNavigateTranscribe() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TranscribePage()),
+    );
   }
 
   void _refreshSessionList() {
@@ -170,8 +179,24 @@ class _ChatPageState extends State<ChatPage>
     if (screenWidth > FormFactor.mobile) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Chat'),
+          title: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              SvgPicture.asset(
+                'assets/images/logo.svg',
+                semanticsLabel: 'SiYuan AI Companion Logo',
+                height: 40,
+              ),
+              const Expanded(child: Center(child: Text('Chat'))),
+            ],
+          ),
           actions: [
+            IconButton(
+              onPressed: () => _onNavigateTranscribe(),
+              icon: const Icon(Icons.mic_none_outlined),
+            ),
             IconButton(
               onPressed: () => _onNewSession(null),
               icon: const Icon(Icons.add),
@@ -211,7 +236,22 @@ class _ChatPageState extends State<ChatPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        title: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SvgPicture.asset(
+              'assets/images/logo.svg',
+              semanticsLabel: 'SiYuan AI Companion Logo',
+              height: 40,
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Text('Chat'),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: () => _onNewSession(null),
@@ -255,8 +295,8 @@ class _ChatPageState extends State<ChatPage>
 
     final configProvider = context.read<ConfigProvider>();
     _provider = OpenAiProvider(
-        configProvider: configProvider,
-        refreshSessionList: _refreshSessionList,
+      configProvider: configProvider,
+      refreshSessionList: _refreshSessionList,
     );
 
     _sessionsFuture = _initializeAll();
