@@ -1,0 +1,38 @@
+name: Publish Built Flutter App
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.29.3
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web app
+        run: flutter build web --release --base-href "/ui/"
+
+      - name: Create release.zip from build/web
+        run: |
+          cd build/web
+          zip -r ../../release.zip .
+          cd ../../
+
+      - name: Upload release.zip to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release.zip
