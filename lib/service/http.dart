@@ -14,11 +14,20 @@ class HttpException implements Exception {
   }
 }
 
+enum AuthType { none, apiKey }
+
 class HttpService {
   static final _client = http.Client();
+  static String? apiKey;
 
   static Future<Map<String, dynamic>> rawGet(String url) async {
-    final response = await _client.get(Uri.parse(url));
+    final response = await _client.get(
+      Uri.parse(url),
+      headers: {
+        if (apiKey != null && apiKey!.isNotEmpty)
+          'Authorization': 'Bearer $apiKey',
+      },
+    );
 
     if (response.statusCode != 200) {
       throw HttpException('Failed to load data: ${response.statusCode}');
@@ -35,7 +44,11 @@ class HttpService {
   ) async {
     final response = await _client.post(
       Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        if (apiKey != null && apiKey!.isNotEmpty)
+          'Authorization': 'Bearer $apiKey',
+      },
       body: jsonEncode(payload),
     );
 
@@ -53,14 +66,20 @@ class HttpService {
     String model,
   ) async {
     final data = await HttpService.rawPost(
-      'http://localhost:5000/openai/direct/v1/retrieve',
-      //'$ORIGIN/openai/direct/v1/retrieve',
-      {
-        'prompt': prompt,
-        'model': model,
-      },
+      '$ORIGIN/openai/direct/v1/retrieve',
+      {'prompt': prompt, 'model': model},
     );
 
     return List<String>.from(data['context'].map((x) => x.toString()));
+  }
+
+  static Future<AuthType> getAuthConfig() async {
+    final data = await HttpService.rawGet('$ORIGIN/health');
+
+    if (data['apiKeyRequired'] == true) {
+      return AuthType.apiKey;
+    } else {
+      return AuthType.none;
+    }
   }
 }

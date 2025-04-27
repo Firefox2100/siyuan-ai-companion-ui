@@ -1,16 +1,7 @@
-# siyuan_ai_companion_ui
+# SiYuan AI Companion UI
 
-A new Flutter project.
+A Flutter UI for [Siyuan AI Companion](https://github.com/Firefox2100/siyuan-ai-companion), featuring a chat interface and audio transcription controls.
 
-## Getting Started
+## Usage
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This project is written in Flutter. A pre-compiled version of this UI is bundled with the Siyuan AI Companion, in its data folder. The backend service will also serve the UI directly from the data folder. There's no need to manually serve this project directly, unless you have a large number of users that the ASGI Python app cannot handle.

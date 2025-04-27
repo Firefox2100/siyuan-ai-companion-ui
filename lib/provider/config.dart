@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dart_openai/dart_openai.dart';
 
 import 'package:siyuan_ai_companion_ui/model/consts.dart';
+import 'package:siyuan_ai_companion_ui/service/http.dart';
 
 class ConfigProvider extends ChangeNotifier {
   late final SharedPreferences _prefs;
@@ -40,6 +41,7 @@ class ConfigProvider extends ChangeNotifier {
 
     if (_openAiKey != null && _openAiKey!.isNotEmpty) {
       OpenAI.apiKey = _openAiKey!;
+      HttpService.apiKey = _openAiKey!;
     } else {
       OpenAI.apiKey = 'debug-key';
     }
@@ -70,6 +72,7 @@ You are an assistant whose primary role is to answer user questions and provide 
     await _prefs.setString('open_ai_key', key);
 
     OpenAI.apiKey = key;
+    HttpService.apiKey = key;
 
     notifyListeners();
   }

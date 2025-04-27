@@ -13,7 +13,6 @@ class SettingInput extends StatefulWidget {
 }
 
 class _SettingInputState extends State<SettingInput> {
-  final TextEditingController _openAiKeyController = TextEditingController();
   final TextEditingController _openAiOrgIdController = TextEditingController();
   final TextEditingController _openAiModelController = TextEditingController();
   final TextEditingController _openAiApiUrlController = TextEditingController();
@@ -28,10 +27,6 @@ class _SettingInputState extends State<SettingInput> {
 
     final configProvider = context.read<ConfigProvider>();
 
-    if (configProvider.openAiKey != null &&
-        configProvider.openAiKey!.isNotEmpty) {
-      _openAiKeyController.text = configProvider.openAiKey!;
-    }
     if (configProvider.openAiOrgId != null &&
         configProvider.openAiOrgId!.isNotEmpty) {
       _openAiOrgIdController.text = configProvider.openAiOrgId!;
@@ -53,7 +48,6 @@ class _SettingInputState extends State<SettingInput> {
 
   @override
   void dispose() {
-    _openAiKeyController.dispose();
     _openAiOrgIdController.dispose();
     _openAiModelController.dispose();
     _openAiApiUrlController.dispose();
@@ -82,24 +76,6 @@ class _SettingInputState extends State<SettingInput> {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
             child: Divider(),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10, bottom: 10, right: 50),
-            child: TextFormField(
-              controller: _openAiKeyController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.key),
-                labelText: 'OpenAI API Key',
-                hintText: 'Optional if using self-hosted OpenAI API',
-                border: OutlineInputBorder(),
-              ),
-              onSaved: (value) {
-                if (value == null || value.isEmpty) {
-                  return;
-                }
-                configProvider.setOpenAiKey(value);
-              },
-            ),
           ),
           Padding(
             padding: EdgeInsets.only(top: 10, bottom: 10, right: 50),
