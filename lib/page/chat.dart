@@ -173,6 +173,20 @@ class _ChatPageState extends State<ChatPage>
     );
   }
 
+  // Stream<String> _messageSender(
+  //     String prompt, {
+  //       required Iterable<Attachment> attachments,
+  //     }) async* {
+  //   final response = _provider.sendMessageStream(
+  //     prompt,
+  //     attachments: attachments,
+  //   );
+  //
+  //   final text = await response.join();
+  //
+  //   yield text;
+  // }
+
   Widget _buildChatLayout(List<ChatSession> sessions) {
     final screenWidth = MediaQuery.sizeOf(context).width;
 
@@ -227,6 +241,8 @@ class _ChatPageState extends State<ChatPage>
                 provider: _provider,
                 welcomeMessage: 'Welcome to SiYuan AI Companion!',
                 suggestions: const ['What is in my calendar today?'],
+                enableAttachments: false,
+                // messageSender: _messageSender,
               ),
             ),
           ],
@@ -278,6 +294,8 @@ class _ChatPageState extends State<ChatPage>
         provider: _provider,
         welcomeMessage: 'Welcome to SiYuan AI Companion!',
         suggestions: const ['What is in my calendar today?'],
+        enableAttachments: false,
+        // messageSender: _messageSender,
       ),
     );
   }

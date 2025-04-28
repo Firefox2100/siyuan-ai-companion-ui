@@ -10,6 +10,7 @@ import 'package:dart_openai/dart_openai.dart';
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/service/database.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
+import 'package:siyuan_ai_companion_ui/service/transcribe.dart';
 
 class SessionRenameException implements Exception {
   final String message;
@@ -161,6 +162,37 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
     String prompt, {
     Iterable<Attachment> attachments = const [],
   }) async* {
+    // Check if the message is audio input
+    // TODO: Wait for framework update to do this elegantly
+    // For now the audio input is sent as an attachment to LLM directly
+    // However, OpenAI API does not support using this in chat completion
+    if (prompt.startsWith('translate the attached audio to text;')) {
+      // Route this to a whisper powered endpoint instead
+      if (attachments.length != 1) {
+        throw LlmFailureException('Audio input must be a single attachment.');
+      }
+
+      if (attachments.first is! FileAttachment) {
+        throw LlmFailureException('Audio input must be a file attachment.');
+      }
+
+      final audioFile = attachments.first as FileAttachment;
+
+      try {
+        final textStream = TranscribeService.transcribeAudioStream(audioFile.bytes);
+
+        await for (final chunk in textStream) {
+          if (chunk.isNotEmpty) {
+            yield chunk;
+          }
+        }
+      } catch (e) {
+        throw LlmFailureException(e.toString());
+      }
+
+      return;
+    }
+
     final messages = <OpenAIChatCompletionChoiceMessageModel>[
       OpenAIChatCompletionChoiceMessageModel(
         role: OpenAIChatMessageRole.system,

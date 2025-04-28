@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import 'package:siyuan_ai_companion_ui/model/consts.dart';
 
@@ -59,6 +61,34 @@ class HttpService {
     final Map<String, dynamic> data = jsonDecode(response.body);
 
     return data;
+  }
+
+  static Future<http.StreamedResponse> rawMultipartRequest(
+    String url,
+    String method,
+    List<int> fileBytes, {
+    String filename = 'recording.wav',
+    MediaType? contentType,
+  }) async {
+    final request = http.MultipartRequest(method, Uri.parse(url))
+      ..files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          fileBytes,
+          filename: filename,
+          contentType: contentType ?? MediaType('audio', 'wav'),
+        ),
+      );
+
+    final streamedResponse = await _client.send(request);
+
+    if (streamedResponse.statusCode != 200) {
+      throw HttpException(
+        'Failed to upload file: ${streamedResponse.statusCode}',
+      );
+    }
+
+    return streamedResponse;
   }
 
   static Future<List<String>> getContextForPrompt(

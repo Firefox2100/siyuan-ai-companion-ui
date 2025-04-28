@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:siyuan_ai_companion_ui/model/consts.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
 
@@ -33,10 +36,22 @@ class TranscribeService {
     return assets;
   }
 
-  static Future<void> transcribeAudio(String path) async {
+  static Future<void> transcribeAudioAsset(String assetPath) async {
     await HttpService.rawPost(
       '$ORIGIN/assets/audio/transcribe',
-      {'assetPath': path},
+      {'assetPath': assetPath},
     );
+  }
+
+  static Stream<String> transcribeAudioStream(Uint8List audioBytes) async* {
+    final streamedResponse = await HttpService.rawMultipartRequest(
+      '$ORIGIN/openai/direct/v1/transcribe',
+      'POST',
+      audioBytes,
+    );
+
+    await for (final chunk in streamedResponse.stream.transform(utf8.decoder)) {
+      yield chunk;
+    }
   }
 }

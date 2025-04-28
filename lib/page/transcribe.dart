@@ -21,7 +21,7 @@ class _TranscribePageState extends State<TranscribePage> {
   }
 
   Future<void> _onTranscribeAudio(String path) async {
-    await TranscribeService.transcribeAudio(path);
+    await TranscribeService.transcribeAudioAsset(path);
 
     _refreshAssetList();
   }
