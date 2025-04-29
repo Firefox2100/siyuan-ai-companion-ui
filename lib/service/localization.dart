@@ -1,4 +1,4 @@
-import 'package:flutter_gen/gen_l10n/localizations.dart';
+import 'package:siyuan_ai_companion_ui/l10n/localizations.dart';
 
 class LocalizationService {
   static late AppLocalizations _l10n;

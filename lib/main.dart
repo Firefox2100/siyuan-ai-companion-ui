@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/localizations.dart';
 
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/page/auth.dart';
 import 'package:siyuan_ai_companion_ui/page/chat.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
 import 'package:siyuan_ai_companion_ui/service/localization.dart';
+import 'package:siyuan_ai_companion_ui/l10n/localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
