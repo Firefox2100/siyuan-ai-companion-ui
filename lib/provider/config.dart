@@ -13,6 +13,7 @@ class ConfigProvider extends ChangeNotifier {
   String? _openAiModel;
   String? _openAiApiUrl;
   String? _openAiSystemPrompt;
+  String? _chatSavingNotebookId;
 
   bool _enableRag = true;
 
@@ -24,6 +25,7 @@ class ConfigProvider extends ChangeNotifier {
     _openAiModel = _prefs.getString('open_ai_model');
     _openAiApiUrl = _prefs.getString('open_ai_api_url');
     _openAiSystemPrompt = _prefs.getString('open_ai_system_prompt');
+    _chatSavingNotebookId = _prefs.getString('chat_saving_notebook_id');
 
     _enableRag = _prefs.getBool('enable_rag') ?? true;
 
@@ -64,6 +66,7 @@ You are an assistant whose primary role is to answer user questions and provide 
   Maintain a helpful, accurate, and concise tone.
   When providing writing assistance, ensure clarity, structure, and relevance to the user's request.
 """;
+  String? get chatSavingNotebookId => _chatSavingNotebookId;
 
   bool get enableRag => _enableRag;
 
@@ -104,6 +107,12 @@ You are an assistant whose primary role is to answer user questions and provide 
   Future<void> setOpenAiSystemPrompt(String systemPrompt) async {
     _openAiSystemPrompt = systemPrompt;
     await _prefs.setString('open_ai_system_prompt', systemPrompt);
+    notifyListeners();
+  }
+
+  Future<void> setChatSavingNotebookId(String notebookId) async {
+    _chatSavingNotebookId = notebookId;
+    await _prefs.setString('chat_saving_notebook_id', notebookId);
     notifyListeners();
   }
 

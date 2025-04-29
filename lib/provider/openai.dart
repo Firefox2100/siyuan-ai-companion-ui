@@ -7,6 +7,7 @@ import 'package:flutter_ai_toolkit/flutter_ai_toolkit.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_openai/dart_openai.dart';
 
+import 'package:siyuan_ai_companion_ui/model/consts.dart';
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/service/database.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
@@ -155,6 +156,34 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
     await renameSession(sessionId, newName);
 
     return newName;
+  }
+
+  Future<void> saveSession(int sessionId) async {
+    if (_configProvider.chatSavingNotebookId == null) {
+      throw Exception('Chat saving notebook ID is not set.');
+    }
+
+    final sessionMap = await DatabaseService.getSession(sessionId);
+
+    final payload = {
+      'notebookId': _configProvider.chatSavingNotebookId,
+      'title': sessionMap['name'],
+      'chat': []
+    };
+
+    for (final message in _history) {
+      final isUser = message.origin.isUser;
+      final text = message.text ?? '';
+      payload['chat'].add({
+        'role': isUser? 'user': 'llm',
+        'content': text,
+      });
+    }
+
+    await HttpService.rawPost(
+      '$ORIGIN/assets/chat',
+      payload,
+    );
   }
 
   @override

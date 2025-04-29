@@ -173,6 +173,11 @@ class _ChatPageState extends State<ChatPage>
     );
   }
 
+  Future<void> _onSaveSession(int sessionId) async {
+    await _provider.saveSession(sessionId);
+    _refreshSessionList();
+  }
+
   // Stream<String> _messageSender(
   //     String prompt, {
   //       required Iterable<Attachment> attachments,
@@ -189,6 +194,7 @@ class _ChatPageState extends State<ChatPage>
 
   Widget _buildChatLayout(List<ChatSession> sessions) {
     final screenWidth = MediaQuery.sizeOf(context).width;
+    final configProvider = context.watch<ConfigProvider>();
 
     if (screenWidth > FormFactor.mobile) {
       return Scaffold(
@@ -233,6 +239,8 @@ class _ChatPageState extends State<ChatPage>
                     (int sessionId) async => await _onRenameSession(sessionId),
                 onSessionDeleted:
                     (int sessionId) async => await _onDeleteSession(sessionId),
+                onSessionSaved: configProvider.chatSavingNotebookId != null?
+                    (int sessionId) async => await _onSaveSession(sessionId) : null,
               ),
             ),
             const VerticalDivider(width: 1),

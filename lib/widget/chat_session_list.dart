@@ -9,12 +9,14 @@ class ChatSessionList extends StatelessWidget {
     required this.onSessionSelected,
     required this.onSessionRenamed,
     required this.onSessionDeleted,
+    this.onSessionSaved,
   });
 
   final List<ChatSession> sessions;
   final Function(int) onSessionSelected;
   final Function(int) onSessionRenamed;
   final Function(int) onSessionDeleted;
+  final Function(int)? onSessionSaved;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,7 @@ class ChatSessionList extends StatelessWidget {
           onSelected: onSessionSelected,
           onRenamed: onSessionRenamed,
           onDeleted: onSessionDeleted,
+          onSaved: onSessionSaved,
         );
       },
     );
@@ -39,12 +42,14 @@ class _ChatSessionTile extends StatefulWidget {
     required this.onSelected,
     required this.onRenamed,
     required this.onDeleted,
+    this.onSaved,
   });
 
   final ChatSession session;
   final Function(int) onSelected;
   final Function(int) onRenamed;
   final Function(int) onDeleted;
+  final Function(int)? onSaved;
 
   @override
   State<_ChatSessionTile> createState() => _ChatSessionTileState();
@@ -65,48 +70,54 @@ class _ChatSessionTileState extends State<_ChatSessionTile> {
         title: Text(widget.session.name),
         subtitle: Text(widget.session.createdAt.toLocal().toString()),
         onTap: () => widget.onSelected(widget.session.id),
-        trailing: (_hovering || _isMenuOpen)
-            ? PopupMenuButton<String>(
-          key: _popupMenuKey,
-          itemBuilder: (context) {
-            return [
-              PopupMenuItem(
-                value: 'rename',
-                child: const Text('Rename'),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: const Text('Delete'),
-              ),
-            ];
-          },
-          onSelected: (value) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted) return;
+        trailing:
+            (_hovering || _isMenuOpen)
+                ? PopupMenuButton<String>(
+                  key: _popupMenuKey,
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(
+                        value: 'rename',
+                        child: const Text('Rename'),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: const Text('Delete'),
+                      ),
+                      if (widget.onSaved != null &&
+                          widget.session.name != '@New Conversation')
+                        PopupMenuItem(value: 'save', child: const Text('Save')),
+                    ];
+                  },
+                  onSelected: (value) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!mounted) return;
 
-              if (value == 'rename') {
-                widget.onRenamed(widget.session.id);
-              } else if (value == 'delete') {
-                widget.onDeleted(widget.session.id);
-              }
-            });
+                      if (value == 'rename') {
+                        widget.onRenamed(widget.session.id);
+                      } else if (value == 'delete') {
+                        widget.onDeleted(widget.session.id);
+                      } else if (value == 'save' && widget.onSaved != null) {
+                        widget.onSaved!(widget.session.id);
+                      }
+                    });
 
-            setState(() {
-              _isMenuOpen = false;
-            });
-          },
-          onOpened: () {
-            setState(() {
-              _isMenuOpen = true;
-            });
-          },
-          onCanceled: () {
-            setState(() {
-              _isMenuOpen = false;
-            });
-          },
-        )
-            : null,
+                    setState(() {
+                      _isMenuOpen = false;
+                    });
+                  },
+                  onOpened: () {
+                    setState(() {
+                      _isMenuOpen = true;
+                    });
+                  },
+                  onCanceled: () {
+                    setState(() {
+                      _isMenuOpen = false;
+                    });
+                  },
+                )
+                : null,
       ),
     );
   }
