@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:siyuan_ai_companion_ui/model/form_factor.dart';
 import 'package:siyuan_ai_companion_ui/service/transcribe.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 class TranscribePage extends StatefulWidget {
   const TranscribePage({super.key});
@@ -36,6 +37,7 @@ class _TranscribePageState extends State<TranscribePage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
+    final l10n = LocalizationService.l10n;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,10 +50,10 @@ class _TranscribePageState extends State<TranscribePage> {
                   children: [
                     SvgPicture.asset(
                       'assets/images/logo.svg',
-                      semanticsLabel: 'SiYuan AI Companion Logo',
+                      semanticsLabel: l10n.logoLabel,
                       height: 40,
                     ),
-                    const Expanded(child: Center(child: Text('Transcribe'))),
+                    Expanded(child: Center(child: Text(l10n.transcribe))),
                   ],
                 )
                 : Row(
@@ -61,12 +63,12 @@ class _TranscribePageState extends State<TranscribePage> {
                   children: [
                     SvgPicture.asset(
                       'assets/images/logo.svg',
-                      semanticsLabel: 'SiYuan AI Companion Logo',
+                      semanticsLabel: l10n.logoLabel,
                       height: 40,
                     ),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: Text('Transcribe'),
+                      child: Text(l10n.transcribe),
                     ),
                   ],
                 ),
@@ -97,8 +99,8 @@ class _TranscribePageState extends State<TranscribePage> {
           final audioAssets = snapshot.data ?? [];
 
           if (audioAssets.isEmpty) {
-            return const Scaffold(
-              body: Center(child: Text('No audio assets found')),
+            return Scaffold(
+              body: Center(child: Text(l10n.noAudioAssetMessage)),
             );
           }
 
@@ -116,7 +118,7 @@ class _TranscribePageState extends State<TranscribePage> {
                   child: ListTile(
                     title: Text(asset.path),
                     subtitle: Text(
-                      asset.transcriptionBlockId ?? 'No transcription',
+                      asset.transcriptionBlockId ?? l10n.noTranscription,
                     ),
                     trailing:
                         asset.transcriptionBlockId == null
@@ -139,7 +141,7 @@ class _TranscribePageState extends State<TranscribePage> {
                   child: ListTile(
                     title: Text(asset.path),
                     subtitle: Text(
-                      asset.transcriptionBlockId ?? 'No transcription',
+                      asset.transcriptionBlockId ?? l10n.noTranscription,
                     ),
                     trailing:
                         asset.transcriptionBlockId == null

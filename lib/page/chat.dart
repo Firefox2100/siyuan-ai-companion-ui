@@ -8,6 +8,7 @@ import 'package:siyuan_ai_companion_ui/page/setting.dart';
 import 'package:siyuan_ai_companion_ui/page/transcribe.dart';
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/provider/openai.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 import 'package:siyuan_ai_companion_ui/widget/chat_session_list.dart';
 import 'package:siyuan_ai_companion_ui/widget/setting.dart';
 
@@ -26,6 +27,7 @@ class _ChatPageState extends State<ChatPage>
   Future<void> _onShowSettings() async {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final screenHeight = MediaQuery.sizeOf(context).height;
+    final l10n = LocalizationService.l10n;
 
     if (screenWidth > FormFactor.mobile) {
       // Wider layout, display as a popup
@@ -39,9 +41,12 @@ class _ChatPageState extends State<ChatPage>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Settings',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                Text(
+                  l10n.settings,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
@@ -56,7 +61,7 @@ class _ChatPageState extends State<ChatPage>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                child: Text(l10n.cancel),
               ),
               TextButton(
                 onPressed: () {
@@ -65,7 +70,7 @@ class _ChatPageState extends State<ChatPage>
                     Navigator.pop(context);
                   }
                 },
-                child: const Text('Save'),
+                child: Text(l10n.save),
               ),
             ],
           );
@@ -104,15 +109,17 @@ class _ChatPageState extends State<ChatPage>
   }
 
   Future<void> _onRenameSession(int sessionId) async {
+    final l10n = LocalizationService.l10n;
+
     final controller = TextEditingController();
     await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Rename Session'),
+          title: Text(l10n.renameSession),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(labelText: 'New Name'),
+            decoration: InputDecoration(labelText: l10n.newName),
             onSubmitted: (newName) async {
               await _provider.renameSession(sessionId, newName);
 
@@ -132,11 +139,11 @@ class _ChatPageState extends State<ChatPage>
                   _refreshSessionList();
                 }
               },
-              child: const Text('Rename'),
+              child: Text(l10n.rename),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
           ],
         );
@@ -145,12 +152,14 @@ class _ChatPageState extends State<ChatPage>
   }
 
   Future<void> _onDeleteSession(int sessionId) async {
+    final l10n = LocalizationService.l10n;
+
     await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete Session'),
-          content: const Text('Are you sure you want to delete this session?'),
+          title: Text(l10n.deleteSession),
+          content: Text(l10n.deleteSessionConfirmation),
           actions: [
             TextButton(
               onPressed: () async {
@@ -161,11 +170,11 @@ class _ChatPageState extends State<ChatPage>
                   _refreshSessionList();
                 }
               },
-              child: const Text('Delete'),
+              child: Text(l10n.delete),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
           ],
         );
@@ -195,6 +204,7 @@ class _ChatPageState extends State<ChatPage>
   Widget _buildChatLayout(List<ChatSession> sessions) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final configProvider = context.watch<ConfigProvider>();
+    final l10n = LocalizationService.l10n;
 
     if (screenWidth > FormFactor.mobile) {
       return Scaffold(
@@ -206,10 +216,10 @@ class _ChatPageState extends State<ChatPage>
             children: [
               SvgPicture.asset(
                 'assets/images/logo.svg',
-                semanticsLabel: 'SiYuan AI Companion Logo',
+                semanticsLabel: l10n.logoLabel,
                 height: 40,
               ),
-              const Expanded(child: Center(child: Text('Chat'))),
+              Expanded(child: Center(child: Text(l10n.chat))),
             ],
           ),
           actions: [
@@ -239,16 +249,19 @@ class _ChatPageState extends State<ChatPage>
                     (int sessionId) async => await _onRenameSession(sessionId),
                 onSessionDeleted:
                     (int sessionId) async => await _onDeleteSession(sessionId),
-                onSessionSaved: configProvider.chatSavingNotebookId != null?
-                    (int sessionId) async => await _onSaveSession(sessionId) : null,
+                onSessionSaved:
+                    configProvider.chatSavingNotebookId != null
+                        ? (int sessionId) async =>
+                            await _onSaveSession(sessionId)
+                        : null,
               ),
             ),
             const VerticalDivider(width: 1),
             Expanded(
               child: LlmChatView(
                 provider: _provider,
-                welcomeMessage: 'Welcome to SiYuan AI Companion!',
-                suggestions: const ['What is in my calendar today?'],
+                welcomeMessage: l10n.welcomeMessage,
+                suggestions: [l10n.calendarPrompt],
                 enableAttachments: false,
                 // messageSender: _messageSender,
               ),
@@ -267,12 +280,12 @@ class _ChatPageState extends State<ChatPage>
           children: [
             SvgPicture.asset(
               'assets/images/logo.svg',
-              semanticsLabel: 'SiYuan AI Companion Logo',
+              semanticsLabel: l10n.logoLabel,
               height: 40,
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Text('Chat'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Text(l10n.chat),
             ),
           ],
         ),
@@ -300,8 +313,8 @@ class _ChatPageState extends State<ChatPage>
       ),
       body: LlmChatView(
         provider: _provider,
-        welcomeMessage: 'Welcome to SiYuan AI Companion!',
-        suggestions: const ['What is in my calendar today?'],
+        welcomeMessage: l10n.welcomeMessage,
+        suggestions: [l10n.calendarPrompt],
         enableAttachments: false,
         // messageSender: _messageSender,
       ),

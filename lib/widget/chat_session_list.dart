@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:siyuan_ai_companion_ui/provider/openai.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 class ChatSessionList extends StatelessWidget {
   const ChatSessionList({
@@ -63,6 +64,8 @@ class _ChatSessionTileState extends State<_ChatSessionTile> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = LocalizationService.l10n;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
@@ -76,17 +79,11 @@ class _ChatSessionTileState extends State<_ChatSessionTile> {
                   key: _popupMenuKey,
                   itemBuilder: (context) {
                     return [
-                      PopupMenuItem(
-                        value: 'rename',
-                        child: const Text('Rename'),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: const Text('Delete'),
-                      ),
+                      PopupMenuItem(value: 'rename', child: Text(l10n.rename)),
+                      PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
                       if (widget.onSaved != null &&
-                          widget.session.name != '@New Conversation')
-                        PopupMenuItem(value: 'save', child: const Text('Save')),
+                          widget.session.name != l10n.newConversationName)
+                        PopupMenuItem(value: 'save', child: Text(l10n.save)),
                     ];
                   },
                   onSelected: (value) {

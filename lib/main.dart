@@ -6,6 +6,7 @@ import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/page/auth.dart';
 import 'package:siyuan_ai_companion_ui/page/chat.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,10 +61,12 @@ class _MyAppState extends State<MyApp> {
     }
 
     final configProvider = context.watch<ConfigProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    LocalizationService.update(l10n);
 
     return MaterialApp(
       title: 'SiYuan AI Companion',
-      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+      onGenerateTitle: (context) => l10n.appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData(

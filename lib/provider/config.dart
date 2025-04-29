@@ -4,6 +4,7 @@ import 'package:dart_openai/dart_openai.dart';
 
 import 'package:siyuan_ai_companion_ui/model/consts.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 class ConfigProvider extends ChangeNotifier {
   late final SharedPreferences _prefs;
@@ -58,14 +59,7 @@ class ConfigProvider extends ChangeNotifier {
   String? get openAiModel => _openAiModel;
   String? get openAiApiUrl => _openAiApiUrl;
   String get openAiSystemPrompt =>
-      _openAiSystemPrompt ??
-      """
-You are an assistant whose primary role is to answer user questions and provide writing assistance.
-  Always prioritize any context explicitly provided with the user prompt.
-  If something is unclear, ambiguous, or outside your knowledge, clearly communicate this to the user instead of making assumptions.
-  Maintain a helpful, accurate, and concise tone.
-  When providing writing assistance, ensure clarity, structure, and relevance to the user's request.
-""";
+      _openAiSystemPrompt ?? LocalizationService.l10n.defaultSystemPrompt;
   String? get chatSavingNotebookId => _chatSavingNotebookId;
 
   bool get enableRag => _enableRag;

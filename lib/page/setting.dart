@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:siyuan_ai_companion_ui/widget/setting.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -14,9 +15,11 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = LocalizationService.l10n;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),

@@ -1,5 +1,7 @@
 import 'package:sembast_web/sembast_web.dart';
 
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
+
 class DatabaseService {
   static Database? _db;
   static final _sessionsStore = intMapStoreFactory.store('sessions');
@@ -18,13 +20,15 @@ class DatabaseService {
   }
 
   static Future<int> createSession(String? name) async {
+    final l10n = LocalizationService.l10n;
+
     final dbClient = await db;
-    name = (name == null || name.isEmpty) ? '@New Conversation' : name;
+    name = (name == null || name.isEmpty) ? l10n.newConversationName : name;
 
     final finder = Finder(filter: Filter.equals('name', name));
     final existing = await _sessionsStore.findFirst(dbClient, finder: finder);
 
-    if (name == '@New Conversation' && existing != null) {
+    if (name == l10n.newConversationName && existing != null) {
       final sessionId = existing.key;
       final messageCount = await _messagesStore.count(
         dbClient,

@@ -1,4 +1,52 @@
 {
   "@@locale": "en",
-  "appTitle": "SiYuan AI Companion"
+  "appTitle": "SiYuan AI Companion",
+  "openAiApiSettings": "OpenAI API Settings",
+  "apiKey": "API Key",
+  "apiKeyHint": "API key to authenticate with the server",
+  "orgId": "OpenAI Organization ID",
+  "orgIdHint": "Optional if using self-hosted OpenAI API",
+  "openAiModel": "OpenAI Model",
+  "openAiModelHint": "The model to use for generation",
+  "openAiApiUrl": "OpenAI API URL",
+  "openAiApiUrlHint": "Leave empty to use the backend API",
+  "openAiSystemPrompt": "OpenAI System Prompt",
+  "openAiSystemPromptHint": "The system prompt to use for generation",
+  "chatSavingNotebook": "Chat Saving Notebook",
+  "chatSavingNotebookHint": "Select a notebook to save chat history",
+  "enableRag": "Enable RAG",
+  "rename": "Rename",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "save": "Save",
+  "newConversationName": "@New Conversation",
+  "ragPrompt": "Context:\\n{context}\\nAnswer the question: {question}\\nAnswer:",
+  "@ragPrompt": {
+    "description": "RAG prompt template",
+    "placeholders": {
+      "context": {
+        "type": "String",
+        "example": "The context to use for generation"
+      },
+      "question": {
+        "type": "String",
+        "example": "The question to ask"
+      }
+    }
+  },
+  "defaultSystemPrompt": "You are an assistant whose primary role is to answer user questions and provide writing assistance.\n  Always prioritize any context explicitly provided with the user prompt.\n  If something is unclear, ambiguous, or outside your knowledge, clearly communicate this to the user instead of making assumptions.\n  Maintain a helpful, accurate, and concise tone.\n  When providing writing assistance, ensure clarity, structure, and relevance to the user's request.",
+  "logoLabel": "SiYuan AI Companion Logo",
+  "transcribe": "Transcribe",
+  "noAudioAssetMessage": "No audio assets found",
+  "noTranscription": "No transcription",
+  "settings": "Settings",
+  "renameSession": "Rename Session",
+  "newName": "New Name",
+  "deleteSession": "Delete Session",
+  "deleteSessionConfirmation": "Are you sure you want to delete this session?",
+  "chat": "Chat",
+  "welcomeMessage": "Welcome to SiYuan AI Companion",
+  "calendarPrompt": "What is in my calendar today?",
+  "authenticatePrompt": "Please authenticate to continue",
+  "authenticate": "Authenticate"
 }

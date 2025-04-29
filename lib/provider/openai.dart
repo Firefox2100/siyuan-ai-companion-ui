@@ -12,6 +12,7 @@ import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/service/database.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
 import 'package:siyuan_ai_companion_ui/service/transcribe.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 class SessionRenameException implements Exception {
   final String message;
@@ -73,9 +74,11 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
   }
 
   Future<void> startNewSession(String? name) async {
+    final l10n = LocalizationService.l10n;
+
     final cleanName = (name ?? '').trim();
     // @New Conversation is reserved
-    if (cleanName == '@New Conversation') {
+    if (cleanName == l10n.newConversationName) {
       throw SessionRenameException('Session name cannot be "@New Conversation".');
     }
 
@@ -99,7 +102,9 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
   }
 
   Future<void> renameSession(int sessionId, String newName) async {
-    if (newName.trim() == '@New Conversation') {
+    final l10n = LocalizationService.l10n;
+
+    if (newName.trim() == l10n.newConversationName) {
       throw SessionRenameException('Session name cannot be "@New Conversation".');
     }
 
@@ -118,6 +123,7 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
   }
 
   Future<String> generateSessionName({int? sessionId}) async {
+    final l10n = LocalizationService.l10n;
     sessionId ??= _activeSessionId;
 
     if (sessionId == null) {
@@ -126,7 +132,7 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
 
     final sessionMap = await DatabaseService.getSession(sessionId);
 
-    if (sessionMap['name'] != '@New Conversation') {
+    if (sessionMap['name'] != l10n.newConversationName) {
       throw Exception('Session is already named');
     }
 
@@ -286,6 +292,8 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
     String prompt, {
     Iterable<Attachment> attachments = const [],
   }) async* {
+    final l10n = LocalizationService.l10n;
+
     if (_activeSessionId == null) {
       throw Exception('No active session. Call startNewSession() first.');
     }
@@ -302,7 +310,7 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
         );
 
         if (contexts.isNotEmpty) {
-          prompt = 'Context:\n${contexts.join('\n')}\nAnswer the question: $prompt';
+          prompt = l10n.ragPrompt(contexts.join('\n'), prompt);
         }
       }
     } catch (e) {
@@ -330,7 +338,7 @@ class OpenAiProvider extends LlmProvider with ChangeNotifier {
           _history[1].origin.isLlm) {
         final session = await DatabaseService.getSession(_activeSessionId!);
 
-        if (session['name'] == '@New Conversation') {
+        if (session['name'] == l10n.newConversationName) {
           final newName = await generateSessionName(sessionId: _activeSessionId);
 
           DatabaseService.renameSession(_activeSessionId!, newName);

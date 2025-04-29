@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
 import 'package:siyuan_ai_companion_ui/service/http.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 class SettingInput extends StatefulWidget {
   const SettingInput({super.key, required this.formKey});
@@ -82,6 +83,7 @@ class _SettingInputState extends State<SettingInput> {
   @override
   Widget build(BuildContext context) {
     final configProvider = context.watch<ConfigProvider>();
+    final l10n = LocalizationService.l10n;
 
     return Form(
       key: widget.formKey,
@@ -93,7 +95,7 @@ class _SettingInputState extends State<SettingInput> {
           Padding(
             padding: const EdgeInsets.only(left: 40),
             child: Text(
-              'OpenAI API Settings',
+              l10n.openAiApiSettings,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -106,9 +108,9 @@ class _SettingInputState extends State<SettingInput> {
             child: TextFormField(
               controller: _openAiKeyController,
               decoration: InputDecoration(
-                icon: Icon(Icons.key),
-                labelText: 'API Key',
-                hintText: 'API key to authenticate with the server',
+                icon: const Icon(Icons.key),
+                labelText: l10n.apiKey,
+                hintText: l10n.apiKeyHint,
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -137,10 +139,10 @@ class _SettingInputState extends State<SettingInput> {
             padding: const EdgeInsets.only(top: 10, bottom: 10, right: 50),
             child: TextFormField(
               controller: _openAiOrgIdController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.account_circle),
-                labelText: 'OpenAI Organization ID',
-                hintText: 'Optional if using self-hosted OpenAI API',
+              decoration: InputDecoration(
+                icon: const Icon(Icons.account_circle),
+                labelText: l10n.orgId,
+                hintText: l10n.orgIdHint,
                 border: OutlineInputBorder(),
               ),
               onSaved: (value) {
@@ -155,10 +157,10 @@ class _SettingInputState extends State<SettingInput> {
             padding: const EdgeInsets.only(top: 10, bottom: 10, right: 50),
             child: TextFormField(
               controller: _openAiModelController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.model_training),
-                labelText: 'OpenAI Model',
-                hintText: 'The model to use for generation',
+              decoration: InputDecoration(
+                icon: const Icon(Icons.model_training),
+                labelText: l10n.openAiModel,
+                hintText: l10n.openAiModelHint,
                 border: OutlineInputBorder(),
               ),
               onSaved: (value) {
@@ -173,10 +175,10 @@ class _SettingInputState extends State<SettingInput> {
             padding: const EdgeInsets.only(top: 10, bottom: 10, right: 50),
             child: TextFormField(
               controller: _openAiApiUrlController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.api),
-                labelText: 'OpenAI API URL',
-                hintText: 'Leave empty to use the backend API',
+              decoration: InputDecoration(
+                icon: const Icon(Icons.api),
+                labelText: l10n.openAiApiUrl,
+                hintText: l10n.openAiApiUrlHint,
                 border: OutlineInputBorder(),
               ),
               onSaved: (value) {
@@ -191,10 +193,10 @@ class _SettingInputState extends State<SettingInput> {
             padding: const EdgeInsets.only(top: 10, bottom: 10, right: 50),
             child: TextFormField(
               controller: _openAiSystemPromptController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.message),
-                labelText: 'OpenAI System Prompt',
-                hintText: 'The system prompt to use for generation',
+              decoration: InputDecoration(
+                icon: const Icon(Icons.message),
+                labelText: l10n.openAiSystemPrompt,
+                hintText: l10n.openAiSystemPromptHint,
                 border: OutlineInputBorder(),
               ),
               minLines: 5,
@@ -214,10 +216,10 @@ class _SettingInputState extends State<SettingInput> {
                   _notebooks.any((n) => n['id'] == _chatSavingNotebookId)
                       ? _chatSavingNotebookId
                       : null,
-              hint: Text('Select a notebook to save chat history'),
+              hint: Text(l10n.chatSavingNotebookHint),
               decoration: InputDecoration(
                 icon: const Icon(Icons.book),
-                labelText: 'Chat Saving Notebook',
+                labelText: l10n.chatSavingNotebook,
                 border: OutlineInputBorder(),
                 suffixIcon:
                     _isLoading
@@ -263,7 +265,7 @@ class _SettingInputState extends State<SettingInput> {
           Padding(
             padding: const EdgeInsets.only(top: 10, bottom: 10, right: 50),
             child: SwitchListTile(
-              title: const Text('Enable RAG'),
+              title: Text(l10n.enableRag),
               value: _enableRag,
               onChanged: (value) {
                 setState(() {

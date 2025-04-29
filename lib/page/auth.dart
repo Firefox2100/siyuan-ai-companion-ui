@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:siyuan_ai_companion_ui/page/chat.dart';
 import 'package:siyuan_ai_companion_ui/provider/config.dart';
+import 'package:siyuan_ai_companion_ui/service/localization.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -32,6 +33,8 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = LocalizationService.l10n;
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -41,8 +44,8 @@ class _AuthPageState extends State<AuthPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
-                'Welcome to SiYuan AI Companion',
+              Text(
+                l10n.welcomeMessage,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
@@ -58,13 +61,13 @@ class _AuthPageState extends State<AuthPage> {
                 ),
                 child: SvgPicture.asset(
                   'assets/images/logo.svg',
-                  semanticsLabel: 'SiYuan AI Companion Logo',
+                  semanticsLabel: l10n.logoLabel,
                   height: 100,
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Please authenticate to continue',
+              Text(
+                l10n.authenticatePrompt,
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -76,8 +79,8 @@ class _AuthPageState extends State<AuthPage> {
                     controller: _apiKeyController,
                     decoration: InputDecoration(
                       icon: Icon(Icons.key),
-                      labelText: 'API Key',
-                      hintText: 'API key to authenticate with the server',
+                      labelText: l10n.apiKey,
+                      hintText: l10n.apiKeyHint,
                       border: OutlineInputBorder(),
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -103,7 +106,7 @@ class _AuthPageState extends State<AuthPage> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _onAuthenticate,
-                child: const Text('Authenticate'),
+                child: Text(l10n.authenticate),
               ),
             ],
           ),
