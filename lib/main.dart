@@ -61,12 +61,10 @@ class _MyAppState extends State<MyApp> {
     }
 
     final configProvider = context.watch<ConfigProvider>();
-    final l10n = AppLocalizations.of(context)!;
-    LocalizationService.update(l10n);
 
     return MaterialApp(
       title: 'SiYuan AI Companion',
-      onGenerateTitle: (context) => l10n.appTitle,
+      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData(
@@ -76,6 +74,12 @@ class _MyAppState extends State<MyApp> {
           (widget.authType != AuthType.none && configProvider.openAiKey == null)
               ? const AuthPage()
               : const ChatPage(),
+      builder: (context, child) {
+        final l10n = AppLocalizations.of(context)!;
+        LocalizationService.update(l10n);
+
+        return child!;
+      },
     );
   }
 }
